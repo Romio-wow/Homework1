@@ -19,6 +19,13 @@ public class MainClassTest extends MainClass {
 
         Assert.assertTrue("Возвращаемое число должно быть больше 45", classNumber > 45);
 
+    }
+
+    //тест, который проверяет, что метод getClassString возвращает строку, в которой есть подстрока “hello” или “Hello”, если нет ни одной из подстрок - тест падает.
+    @Test
+    public void testGetClassString(){
+        String classString = getClassString();
+        Assert.assertTrue("Строка класса должна содержать «hello» или «Hello».",classString.toLowerCase().contains("hello"));
 
     }
 }
