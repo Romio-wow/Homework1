@@ -38,6 +38,7 @@ public class FirstTest {
         driver.quit();
     }
 
+
     @Test
     public void firsTest() {
 
@@ -66,6 +67,7 @@ public class FirstTest {
                 15
         );
     }
+
 
     @Test
     public void testCancelSearch() {
@@ -170,6 +172,71 @@ public class FirstTest {
             fail("Search field does not contain the expected text. Found: " + actualText);
         }
     }
+
+
+    // ДЗ Написать тест, который ищет какое-то слово
+    //Убеждается, что найдено несколько статей
+    //Отменяет поиск
+    //Убеждается, что результат поиска пропал
+    @Test
+    public void testCancelSearchAndVerifyResultsDisappeared() {
+        waitForElementAndClick(
+                By.id("org.wikipedia:id/fragment_onboarding_skip_button"),
+                "Cannot find button Skip",
+                5
+        );
+
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text,'Search Wikipedia')]"),
+                "Cannot find Search Wikipedia input",
+                5
+        );
+
+        // Вводим ключевое слово для поиска
+        waitForElementAndSendKeys(
+                By.id("org.wikipedia:id/search_src_text"),
+                "Python",
+                "Cannot find search input",
+                5
+        );
+
+        // Убеждаемся, что найдено как минимум два элемента
+        waitForElementPresent(
+                By.xpath("//android.widget.TextView[@resource-id=\"org.wikipedia:id/page_list_item_title\" and @text=\"Python\"]"),
+                "Cannot find the first search result",
+                5
+        );
+
+        waitForElementPresent(
+                By.xpath("//android.widget.TextView[@resource-id=\"org.wikipedia:id/page_list_item_title\" and @text=\"Python (programming language)\"]"),
+                "Cannot find the second search result",
+                5
+        );
+
+        // Отменяем поиск
+        waitForElementAndClick(
+                By.id("org.wikipedia:id/search_close_btn"),
+                "Cannot find X to cancel search",
+                5
+        );
+
+        // Убеждаемся, что результаты поиска исчезли
+        waitForElementNotPresent(
+                By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_container']"),
+                "Search results are still visible on the page",
+                5
+        );
+    }
+
+
+
+
+
+
+
+
+
+
 
 
     private WebElement waitForElementPresent(By by, String error_message, long timeoutInSeconds) {
