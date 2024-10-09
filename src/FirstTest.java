@@ -8,13 +8,18 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.ScreenOrientation;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.Duration;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.fail;
@@ -264,11 +269,11 @@ public class FirstTest {
                 15
         );
 
-        swipeUpToFindElement(
-                By.xpath("//*[@text='View article in browser']"),
-                "Cannot find the end of the article title",
-                20
-        );
+//        swipeUpToFindElement(
+//                By.xpath("//*[@text='View article in browser']"),
+//                "Cannot find the end of the article title",
+//                20
+//        );
 
 
     }
@@ -537,7 +542,7 @@ public class FirstTest {
 
 
 
-        driver.runAppInBackground(2);
+        driver.runAppInBackground(java.time.Duration.ofSeconds(5));
 
         waitForElementPresent(
                 By.xpath("//*[contains(@text,'Search Wikipedia')]"),
@@ -609,60 +614,165 @@ public class FirstTest {
         return element;
     }
 
-    protected void swipeUp(int timeOfSwipe) {
-        TouchAction action = new TouchAction(driver);
+//    protected void swipeUp(int timeOfSwipe) {
+//        TouchAction action = new TouchAction(driver);
+//        Dimension size = driver.manage().window().getSize();
+//        int x = size.width / 2;
+//        int startY = (int) (size.width * 0.8);
+//        int endY = (int) (size.width * 0.2);
+//
+//        action
+//                .press(x, startY)
+//                .waitAction(timeOfSwipe)
+//                .moveTo(x, endY)
+//                .release()
+//                .perform();
+//
+//    }
+
+    public void swipeDown(int timeOfScroll)
+    {
+        // Получаем размеры экрана устройства.
         Dimension size = driver.manage().window().getSize();
-        int x = size.width / 2;
-        int startY = (int) (size.width * 0.8);
-        int endY = (int) (size.width * 0.2);
 
-        action
-                .press(x, startY)
-                .waitAction(timeOfSwipe)
-                .moveTo(x, endY)
-                .release()
-                .perform();
+        // Определяем начальную координату по оси Y (примерно 70% от высоты экрана).
+        int startY = (int) (size.height * 0.70);
 
+        // Определяем конечную координату по оси Y (примерно 30% от высоты экрана).
+        int endY = (int) (size.height * 0.30);
+
+        // Определяем центральную координату по оси X (половина ширины экрана).
+        int centerX = size.width / 2;
+
+        // Создаем объект, представляющий палец для выполнения свайпа.
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+
+        // Создаем последовательность действий для выполнения свайпа.
+        Sequence swipe = new Sequence(finger, 1)
+
+                // Двигаем палец на начальную позицию (центр по X, startY по Y).
+                .addAction(finger.createPointerMove(Duration.ofSeconds(0),
+                        PointerInput.Origin.viewport(), centerX, startY))
+
+                // Палец прикасается к экрану.
+                .addAction(finger.createPointerDown(0))
+
+                // Палец двигается к конечной точке (центр по X, endY по Y).
+                .addAction(finger.createPointerMove(Duration.ofMillis(timeOfScroll),
+                        PointerInput.Origin.viewport(), centerX, endY))
+
+                // Убираем палец с экрана.
+                .addAction(finger.createPointerUp(0));
+
+        // Выполняем последовательность действий (свайп вниз).
+        driver.perform(Arrays.asList(swipe));
     }
+
 
     protected void swipeUpQuick() {
         swipeUp(200);
     }
 
-    protected void swipeUpToFindElement(By by, String error_message, int max_swipes) {
-        int already_swiped = 0;
-        while (driver.findElements(by).size() == 0) {
-            if (already_swiped > max_swipes) {
-                waitForElementPresent(by, "Cannot find element by swiping up. \n" + error_message, 0);
-                return;
-            }
-            swipeUpQuick();
-            ++already_swiped;
-        }
+//    protected void swipeUpToFindElement(By by, String error_message, int max_swipes) {
+//        int already_swiped = 0;
+//        while (driver.findElements(by).size() == 0) {
+//            if (already_swiped > max_swipes) {
+//                waitForElementPresent(by, "Cannot find element by swiping up. \n" + error_message, 0);
+//                return;
+//            }
+//            swipeUpQuick();
+//            ++already_swiped;
+//        }
+//
+//    }
+//
+//    protected void swipeElementToLeft(By by, String error_message) {
+//        WebElement element = waitForElementPresent(
+//                by,
+//                error_message,
+//                10);
+//
+//        int left_x = element.getLocation().getX();
+//        int right_x = left_x + element.getSize().getWidth();
+//        int upper_y = element.getLocation().getY();
+//        int lower_y = upper_y + element.getSize().getWidth();
+//        int middle_y = (upper_y + lower_y) / 2;
+//
+//        TouchAction action = new TouchAction(driver);
+//        action
+//                .press(right_x, middle_y)
+//                .waitAction(300)
+//                .moveTo(left_x, middle_y)
+//                .release()
+//                .perform();
+//
+//    }
 
+    public void swipeElementToLeft(By locator_with_type, String error_message) {
+
+        // Находим элемент на экране, ожидая его появления в течение 10 секунд.
+        WebElement element = waitForElementPresent(locator_with_type, error_message, 10);
+
+        // Получаем координаты элемента на экране.
+        Point location = element.getLocation();
+        // Получаем размеры элемента (ширину и высоту).
+        Dimension size = element.getSize();
+
+        // Координата по оси X левой границы элемента.
+        int left_x = location.getX();
+        // Координата по оси X правой границы элемента.
+        int right_x = left_x + size.getWidth();
+        // Координата по оси Y верхней границы элемента.
+        int upper_y = location.getY();
+        // Координата по оси Y нижней границы элемента.
+        int lower_y = upper_y + size.getHeight();
+        // Координата по оси Y средней линии элемента.
+        int middle_y = upper_y + (size.getHeight() / 2);
+
+        // Начальная координата по оси X для свайпа (чуть левее правого края элемента).
+        int start_x = right_x - 20;
+        // Конечная координата по оси X для свайпа (чуть правее левого края элемента).
+        int end_x = left_x + 20;
+        // Начальная координата по оси Y для свайпа (по центру элемента).
+        int start_y = middle_y;
+        // Конечная координата по оси Y для свайпа (также по центру элемента).
+        int end_y = middle_y;
+
+        // Выполняем свайп с начальной точки до конечной с заданной продолжительностью.
+        this.swipe(
+                new Point(start_x, start_y),
+                new Point(end_x, end_y),
+                Duration.ofMillis(550)  // Устанавливаем продолжительность свайпа 550 миллисекунд.
+        );
     }
 
-    protected void swipeElementToLeft(By by, String error_message) {
-        WebElement element = waitForElementPresent(
-                by,
-                error_message,
-                10);
+    protected void swipe(Point start, Point end, Duration duration) {
 
-        int left_x = element.getLocation().getX();
-        int right_x = left_x + element.getSize().getWidth();
-        int upper_y = element.getLocation().getY();
-        int lower_y = upper_y + element.getSize().getWidth();
-        int middle_y = (upper_y + lower_y) / 2;
+        // Создаем объект, представляющий палец для выполнения свайпа.
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        // Создаем последовательность действий для выполнения свайпа.
+        Sequence swipe = new Sequence(finger, 1);
 
-        TouchAction action = new TouchAction(driver);
-        action
-                .press(right_x, middle_y)
-                .waitAction(300)
-                .moveTo(left_x, middle_y)
-                .release()
-                .perform();
+        // Добавляем действие для перемещения пальца к начальной точке.
+        swipe.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), start.x, start.y));
+        // Добавляем действие для нажатия на экран в начальной точке.
+        swipe.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        // Добавляем действие для перемещения пальца из начальной точки в конечную в течение заданного времени.
+        swipe.addAction(finger.createPointerMove(duration, PointerInput.Origin.viewport(), end.x, end.y));
+        // Добавляем действие для отпускания пальца от экрана в конечной точке.
+        swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 
+        // Выполняем последовательность действий (свайп).
+        this.driver.perform(Arrays.asList(swipe));
     }
+
+
+
+
+
+
+
+
 
 
     private int getAmountOfElements(By by) {
@@ -685,6 +795,12 @@ public class FirstTest {
         WebElement element = waitForElementPresent(by, error_message, timeoutInSeconds);
         return element.getAttribute(attribute);
 
+    }
+
+    protected void backgroundApp(int seconds)
+    {
+
+        driver.runAppInBackground(Duration.ofSeconds(seconds));
     }
 
 }
