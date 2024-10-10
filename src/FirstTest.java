@@ -606,6 +606,40 @@ public class FirstTest {
 
     }
 
+    @Test
+    public void testArticleTitlePresent() {
+
+        waitForElementAndClick(
+                By.id("org.wikipedia:id/fragment_onboarding_skip_button"),
+                "Cannot find button Skip",
+                5
+        );
+
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text,'Search Wikipedia')]"),
+                "Cannot find Search Wikipedia input",
+                5);
+
+        waitForElementAndSendKeys(
+                By.xpath("//*[contains(@text,'Search Wikipedia')]"),
+                "Java",
+                "Cannot find search input",
+                5
+        );
+
+        waitForElementAndClick(
+                By.id("org.wikipedia:id/page_list_item_description"),
+                "Cannot find Island in Indonesia",
+                5
+        );
+
+
+        // Проверяем наличие элемента title
+        assertElementPresent(By.id("org.wikipedia:id/view_page_title_text"),
+                "Article title not found"
+        );
+    }
+
 
     private WebElement waitForElementPresent(By by, String error_message, long timeoutInSeconds) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
@@ -832,6 +866,13 @@ public class FirstTest {
     protected void backgroundApp(int seconds) {
 
         driver.runAppInBackground(Duration.ofSeconds(seconds));
+    }
+
+    private void assertElementPresent(By by, String error_message) {
+        List<WebElement> elements = driver.findElements(by);
+        if (elements.isEmpty()) {
+            throw new AssertionError(error_message);
+        }
     }
 
 }
