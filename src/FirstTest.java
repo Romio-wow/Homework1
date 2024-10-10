@@ -14,6 +14,7 @@ import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
 import java.time.Duration;
 
 import java.net.URL;
@@ -29,12 +30,12 @@ public class FirstTest {
     public void setUp() throws Exception {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("platformName", "Android");
-        capabilities.setCapability("deviceName", "and80");
-        capabilities.setCapability("platformName", "8.0");
-        capabilities.setCapability("automationName", "Appium");
-        capabilities.setCapability("appPackage", "org.wikipedia");
-        capabilities.setCapability("appActivity", ".main.MainActivity");
-        capabilities.setCapability("app", "C:\\Users\\Roman\\IdeaProjects\\JavaAppiumAutomation\\apks\\org.wikipedia.apk");
+        capabilities.setCapability("appium:deviceName", "and80");
+        capabilities.setCapability("appium:platformVersion", "8.0");
+        capabilities.setCapability("appium:automationName", "UiAutomator2");
+        capabilities.setCapability("appium:appPackage", "org.wikipedia");
+        capabilities.setCapability("appium:appActivity", ".main.MainActivity");
+        capabilities.setCapability("appium:app", "C:\\Users\\Roman\\IdeaProjects\\JavaAppiumAutomation\\apks\\org.wikipedia.apk");
 
         driver = new AndroidDriver(new URL("http://localhost:4723/wd/hub"), capabilities);
 
@@ -436,13 +437,10 @@ public class FirstTest {
         );
 
 
-
-
-
     }
 
     @Test
-    public void testChangesScreenOrientationOnSearchResult(){
+    public void testChangesScreenOrientationOnSearchResult() {
 
         waitForElementAndClick(
                 By.id("org.wikipedia:id/fragment_onboarding_skip_button"),
@@ -512,7 +510,7 @@ public class FirstTest {
     }
 
     @Test
-    public void testSearchArticleBackground(){
+    public void testSearchArticleBackground() {
 
         waitForElementAndClick(
                 By.id("org.wikipedia:id/fragment_onboarding_skip_button"),
@@ -539,7 +537,6 @@ public class FirstTest {
         );
 
 
-
         driver.runAppInBackground(java.time.Duration.ofSeconds(5));
 
         waitForElementPresent(
@@ -550,15 +547,61 @@ public class FirstTest {
 
 
     }
+
     @Test
-    public void testOnboardingSwipe(){
+    public void testOnboardingSwipe() {
 
         swipeElementToLeft(
                 By.id("org.wikipedia:id/scrollViewContainer"),
                 "Cannot swipe to second onboarding screen"
         );
 
+        // Второй экран Onboarding
+        assertElementHasText(
+                By.id("org.wikipedia:id/primaryTextView"), // Локатор заголовка второго экрана
+                "New ways to explore", // Ожидаемый текст
+                "Cannot find 'New ways to explore' title on second onboarding screen"
+        );
 
+        swipeElementToLeft(
+                By.xpath("//android.widget.LinearLayout[@resource-id='org.wikipedia:id/scrollViewContainer']"),
+                "Cannot swipe to third onboarding screen"
+        );
+
+        // Третий экран Onboarding
+        assertElementHasText(
+                By.id("org.wikipedia:id/primaryTextView"), // Локатор заголовка третьего экрана
+                "Reading lists with sync", // Ожидаемый текст
+                "Cannot find 'Reading lists with sync' title on third onboarding screen"
+        );
+
+        swipeElementToLeft(
+                By.xpath("//android.widget.LinearLayout[@resource-id='org.wikipedia:id/scrollViewContainer']"),
+                "Cannot swipe to fourth onboarding screen"
+        );
+
+        // Четвертый экран Onboarding
+        assertElementHasText(
+                By.id("org.wikipedia:id/primaryTextView"), // Локатор заголовка четвертого экрана
+                "Send anonymous data", // Ожидаемый текст
+                "Cannot find 'Send anonymous data' title on fourth onboarding screen"
+        );
+
+        // Нажатие на кнопку "Accept" на Android
+
+        waitForElementAndClick(
+                By.id("org.wikipedia:id/acceptButton"), // Локатор кнопки на Android
+                "Cannot find and click 'Accept' button",
+                10
+        );
+
+
+        // Проверка отображения главного экрана
+        waitForElementPresent(
+                By.id("org.wikipedia:id/main_toolbar_wordmark"), // Локатор главного экрана
+                "Cannot find main screen after onboarding",
+                10
+        );
 
 
     }
@@ -628,8 +671,7 @@ public class FirstTest {
 //
 //    }
 
-    public void swipeDown(int timeOfScroll)
-    {
+    public void swipeDown(int timeOfScroll) {
         // Получаем размеры экрана устройства.
         Dimension size = driver.manage().window().getSize();
 
@@ -765,14 +807,6 @@ public class FirstTest {
     }
 
 
-
-
-
-
-
-
-
-
     private int getAmountOfElements(By by) {
         List elements = driver.findElements(by);
         return elements.size();
@@ -789,14 +823,13 @@ public class FirstTest {
 
     }
 
-    private String waitForElementAndGetAttribute(By by, String attribute, String error_message, long timeoutInSeconds ){
+    private String waitForElementAndGetAttribute(By by, String attribute, String error_message, long timeoutInSeconds) {
         WebElement element = waitForElementPresent(by, error_message, timeoutInSeconds);
         return element.getAttribute(attribute);
 
     }
 
-    protected void backgroundApp(int seconds)
-    {
+    protected void backgroundApp(int seconds) {
 
         driver.runAppInBackground(Duration.ofSeconds(seconds));
     }
