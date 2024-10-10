@@ -1,5 +1,4 @@
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import org.junit.After;
 import org.junit.Assert;
@@ -7,16 +6,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.ScreenOrientation;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.support.ui.Duration;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import java.time.Duration;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -269,11 +267,11 @@ public class FirstTest {
                 15
         );
 
-//        swipeUpToFindElement(
-//                By.xpath("//*[@text='View article in browser']"),
-//                "Cannot find the end of the article title",
-//                20
-//        );
+        swipeUpToFindElement(
+                By.xpath("//*[@text='View article in browser']"),
+                "Cannot find the end of the article title",
+                20
+        );
 
 
     }
@@ -556,7 +554,7 @@ public class FirstTest {
     public void testOnboardingSwipe(){
 
         swipeElementToLeft(
-                By.xpath("//android.widget.ScrollView[@resource-id=\"org.wikipedia:id/scrollView\"]"),
+                By.id("org.wikipedia:id/scrollViewContainer"),
                 "Cannot swipe to second onboarding screen"
         );
 
@@ -670,22 +668,22 @@ public class FirstTest {
 
 
     protected void swipeUpQuick() {
-        swipeUp(200);
+        swipeDown(200);
     }
 
-//    protected void swipeUpToFindElement(By by, String error_message, int max_swipes) {
-//        int already_swiped = 0;
-//        while (driver.findElements(by).size() == 0) {
-//            if (already_swiped > max_swipes) {
-//                waitForElementPresent(by, "Cannot find element by swiping up. \n" + error_message, 0);
-//                return;
-//            }
-//            swipeUpQuick();
-//            ++already_swiped;
-//        }
-//
-//    }
-//
+    protected void swipeUpToFindElement(By by, String error_message, int max_swipes) {
+        int already_swiped = 0;
+        while (driver.findElements(by).size() == 0) {
+            if (already_swiped > max_swipes) {
+                waitForElementPresent(by, "Cannot find element by swiping up. \n" + error_message, 0);
+                return;
+            }
+            swipeUpQuick();
+            ++already_swiped;
+        }
+
+    }
+
 //    protected void swipeElementToLeft(By by, String error_message) {
 //        WebElement element = waitForElementPresent(
 //                by,
